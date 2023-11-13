@@ -1,17 +1,21 @@
+import os
+from typing import List, Union
+
 from loguru import logger
 from tqdm import tqdm
 
 from langchain.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
+from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 def config_text_splitter(
-    chunk_size=512,
-    chunk_overlap=20,
-    length_function="len",
-    add_start_index=True,
-):
+    chunk_size: int = 512,
+    chunk_overlap: int = 20,
+    length_function: str = "len",
+    add_start_index: bool = True,
+) -> RecursiveCharacterTextSplitter:
     text_splitter = RecursiveCharacterTextSplitter(
         # Set a really small chunk size, just to show.
         chunk_size=chunk_size,
@@ -23,30 +27,30 @@ def config_text_splitter(
 
 
 def preprocess_pdf(
-    pdf_path="/mnt/c/Users/Angus/Downloads/eStatementFile_20231011021455.pdf",
-    text_splitter: RecursiveCharacterTextSplitter = None,
-):
+    pdf_path: Union[str, os.PathLike],
+    text_splitter: RecursiveCharacterTextSplitter,
+) -> List[Document]:
     """
     Load and split a single PDF file
     """
-    loader = PyPDFLoader(pdf_path)
+    loader = PyPDFLoader(str(pdf_path))
     pages = loader.load_and_split(text_splitter)
     return pages
 
 
 def preprocess_pdf_from_directory(
-    path="/mnt/c/Users/Angus/Downloads",
-    glob="**/*.pdf",
-    use_multithreading=False,
-    max_concurrency=4,
-    show_progress=True,
-    text_splitter: RecursiveCharacterTextSplitter = None,
-):
+    text_splitter: RecursiveCharacterTextSplitter,
+    dir_path: Union[str, os.PathLike],
+    glob: str = "**/*.pdf",
+    use_multithreading: bool = False,
+    max_concurrency: int = 4,
+    show_progress: bool = True,
+) -> List[Document]:
     """
     Load and split PDF files from a directory
     """
     loader = DirectoryLoader(
-        path,
+        str(dir_path),
         glob=glob,
         use_multithreading=use_multithreading,
         max_concurrency=max_concurrency,
@@ -57,10 +61,12 @@ def preprocess_pdf_from_directory(
     return pages
 
 
-def get_pdf_embeddings(pages, embedding_model_name="ada"):
+def get_pdf_embeddings(
+    pages: List[Document], embedding_model_name: str = "ada"
+) -> List[List[float]]:
     # TODO add multi thread to speed up
 
-    embeddings = OpenAIEmbeddings(model_name=embedding_model_name)
+    embeddings = OpenAIEmbeddings(model=embedding_model_name)
     # Turn the first text chunk into a vector with the embedding[
     logger.info("Getting embeddings")
     embeds = [
