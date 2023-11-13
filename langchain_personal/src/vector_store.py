@@ -1,17 +1,23 @@
 import os
+
 import pinecone
-from langchain.vectorstores import Pinecone
+
 from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import Pinecone
+
 
 class VectorStore:
-    def __init__(self, index_name="quickstart", dimension=1536, metric="cosine"):
+    def __init__(
+        self, index_name="quickstart", dimension=1536, metric="cosine"
+    ):
         self.index_name = index_name
         self.dimension = dimension
         self.metric = metric
 
     def init_vector_store(self):
         pinecone.init(
-            api_key=os.getenv("PINECONE_API_KEY"), environment=os.getenv("PINECONE_ENV")
+            api_key=os.getenv("PINECONE_API_KEY"),
+            environment=os.getenv("PINECONE_ENV"),
         )
         self.pinecone = pinecone
         if self.index_name not in pinecone.list_indexes():
@@ -24,9 +30,13 @@ class VectorStore:
     def describe_index(self):
         return self.pinecone.describe_index(self.index_name)
 
-    def store_embeddings(self, pages, embedding = OpenAIEmbeddings(model_name="ada")):
+    def store_embeddings(
+        self, pages, embedding=OpenAIEmbeddings(model_name="ada")
+    ):
         """
-        embeddings = 
+        embeddings =
         """
-        db = Pinecone.from_documents(pages, embedding, index_name=self.index_name)
+        db = Pinecone.from_documents(
+            pages, embedding, index_name=self.index_name
+        )
         return db  # return db connection

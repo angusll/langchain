@@ -1,8 +1,9 @@
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
 from loguru import logger
 from tqdm import tqdm
+
+from langchain.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 def config_text_splitter(
@@ -56,11 +57,13 @@ def preprocess_pdf_from_directory(
     return pages
 
 
-def get_pdf_embeddings(pages,embedding_model_name="ada"):
+def get_pdf_embeddings(pages, embedding_model_name="ada"):
     # TODO add multi thread to speed up
-    
+
     embeddings = OpenAIEmbeddings(model_name=embedding_model_name)
     # Turn the first text chunk into a vector with the embedding[
     logger.info("Getting embeddings")
-    embeds = [embeddings.embed_query(page.page_content) for page in tqdm(pages)]
+    embeds = [
+        embeddings.embed_query(page.page_content) for page in tqdm(pages)
+    ]
     return embeds
