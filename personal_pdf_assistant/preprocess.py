@@ -2,12 +2,15 @@ import os
 from typing import List, Union
 
 from loguru import logger
+from models import Credentials
 from tqdm import tqdm
 
 from langchain.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+creds = Credentials()
 
 
 def config_text_splitter(
@@ -66,7 +69,9 @@ def get_pdf_embeddings(
 ) -> List[List[float]]:
     # TODO add multi thread to speed up
 
-    embeddings = OpenAIEmbeddings(model=embedding_model_name)
+    embeddings = OpenAIEmbeddings(
+        model=embedding_model_name, openai_api_key=creds.openai_api_key
+    )
     # Turn the first text chunk into a vector with the embedding[
     logger.info("Getting embeddings")
     embeds = [

@@ -1,10 +1,11 @@
-import os
-
 import pinecone
+from models import Credentials
 
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.vectorstores import Pinecone
+
+creds = Credentials()
 
 
 class VectorStore:
@@ -20,8 +21,8 @@ class VectorStore:
 
     def init_vector_store(self):
         pinecone.init(
-            api_key=os.getenv("PINECONE_API_KEY"),  # type: ignore
-            environment=os.getenv("PINECONE_ENV"),  # type: ignore
+            api_key=creds.pinecone_api_key,
+            environment=creds.pinecone_env,
         )
         self.pinecone = pinecone
         if self.index_name not in pinecone.list_indexes():
